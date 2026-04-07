@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malcom Hotel Kampala | MHK Luxury</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">MHK<span>KAMPALA</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#book-now">Book Now</a></li>
+        </ul>
+        <a href="#book-now" class="nav-btn">Reserve Now</a>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <h1>Malcom Hotel Kampala</h1>
+            <p>Luxury and Comfort in the Heart of Uganda</p>
+        </div>
+    </header>
+
+    <section id="services" class="container">
+        <h2 class="section-title">Our Premium Spaces</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-img" style="background-image: url('https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=600');"></div>
+                <h3>Luxury Suites</h3>
+            </div>
+            <div class="card">
+                <div class="card-img" style="background-image: url('https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600');"></div>
+                <h3>Fine Dining</h3>
+            </div>
+            <div class="card">
+                <div class="card-img" style="background-image: url('https://images.pexels.com/photos/2833037/pexels-photo-2833037.jpeg?auto=compress&cs=tinysrgb&w=600');"></div>
+                <h3>Conference Halls</h3>
+            </div>
+        </div>
+    </section>
+
+    <section id="book-now" class="container booking-section">
+        <h2 class="section-title">Online Reservation</h2>
+        <div class="booking-card">
+            <div class="booking-form">
+                <div class="form-group">
+                    <label>Guest Name</label>
+                    <input type="text" id="user_name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Check-in Date</label>
+                    <input type="date" id="checkin" onchange="calcTotal()">
+                </div>
+                <div class="form-group">
+                    <label>Check-out Date</label>
+                    <input type="date" id="checkout" onchange="calcTotal()">
+                </div>
+                <div class="form-group">
+                    <label>Select Room</label>
+                    <select id="roomType" onchange="calcTotal()">
+                        <option value="200000">Deluxe - UGX 200,000</option>
+                        <option value="450000">Executive Suite - UGX 450,000</option>
+                        <option value="900000">Presidential Suite - UGX 900,000</option>
+                    </select>
+                </div>
+            </div>
+            <div class="total-bar">
+                <h3>Total Price: <span id="displayTotal">UGX 0</span></h3>
+            </div>
+            <button class="btn-confirm" onclick="sendBooking()">Confirm & Notify Manager</button>
+        </div>
+    </section>
+
+    <div id="modal" class="modal" style="display:none;">
+        <div class="modal-box">
+            <h2 style="color: #2e7d32;">✓ Request Sent!</h2>
+            <p>Your booking details have been emailed to the manager. Please check your inbox for a confirmation shortly.</p>
+            <button onclick="document.getElementById('modal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Your real keys from your screenshots
+        const PUBLIC_KEY = "KRYslEK_9fTkvbSbx"; 
+        const SERVICE_ID = "service_yba4n2v";
+        const TEMPLATE_ID = "template_sngbvmm";
+
+        emailjs.init(PUBLIC_KEY); 
+
+        function calcTotal() {
+            const cin = new Date(document.getElementById('checkin').value);
+            const cout = new Date(document.getElementById('checkout').value);
+            const price = document.getElementById('roomType').value;
+            
+            if(cin && cout && cout > cin) {
+                const diffTime = Math.abs(cout - cin);
+                const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                document.getElementById('displayTotal').innerText = "UGX " + (days * price).toLocaleString();
+            }
+        }
+
+        function sendBooking() {
+            const name = document.getElementById('user_name').value;
+            const total = document.getElementById('displayTotal').innerText;
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            const room = document.getElementById('roomType').selectedOptions[0].text;
+
+            if(!name || total === "UGX 0") { 
+                alert("Please enter your name and select valid check-in/out dates!"); 
+                return; 
+            }
+
+            // Variable names matching your EmailJS dashboard template
+            emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+                name: name,
+                title: room,
+                checkin: checkin,
+                checkout: checkout,
+                total: total,
+                email: "binegaambrose@gmail.com" 
+            }).then(() => {
+                document.getElementById('modal').style.display = 'flex';
+                alert("Success! Booking sent to " + name);
+            }).catch((err) => {
+                alert("Failed to send. Please check your internet connection.");
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
